@@ -1,4 +1,5 @@
 import os
+import ssl
 from telebot.async_telebot import AsyncTeleBot
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -21,6 +22,9 @@ proxy_auth = "28VM8Q1D:1BPQ1ALQ"
 # Устанавливаем прокси в переменные окружения
 os.environ['HTTP_PROXY'] = f'http://{proxy}'
 os.environ['HTTPS_PROXY'] = f'https://{proxy}'
+
+# Отключаем проверку hostname для SSL-соединений
+ssl._create_default_https_context = ssl._create_unverified_context
 
 def pars():
     """
