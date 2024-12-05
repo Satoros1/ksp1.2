@@ -4,7 +4,6 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
 import asyncio
 import time
 import re
@@ -14,23 +13,22 @@ BOT_TOKEN = "8108601042:AAGT-oTHp7HvZ1Lk6-UaINeqOEwrTshNL08"
 
 bot = AsyncTeleBot(BOT_TOKEN)
 
-
 def pars():
     """
     Функция для парсинга данных с сайта.
     """
     data = []
-    
-    # Настройки Chrome и WebDriver
+
+    # Укажите путь к вашему установленному ChromeDriver
+    chromedriver_path = "/usr/bin/chromedriver"  # Или другой путь, где находится ваш chromedriver
+
     chrome_options = Options()
     chrome_options.add_argument("--headless")  # Отключаем отображение браузера
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
-    chrome_options.binary_location = "/usr/bin/google-chrome"  # Укажите путь к Google Chrome
 
-    # Автоматическая установка ChromeDriver
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
-    
+    driver = webdriver.Chrome(service=Service(chromedriver_path), options=chrome_options)
+
     try:
         driver.get('https://kas.fyi/krc20-tokens?view=trending')
         time.sleep(5)  # Ждём загрузки страницы
@@ -78,7 +76,7 @@ async def menu(message):
 
                 # Если токен новый
                 if name not in previous_mints:
-                    if mints_int > 10000:  # Новый токен с количеством больше 10,000
+                    if mints_int > 10000:  # Новый токен с количеством больше 10000
                         result.append(f"🔥New KRC-20 - {name} {mints_int} mints!")
                     previous_mints[name] = mints_int
                 else:
