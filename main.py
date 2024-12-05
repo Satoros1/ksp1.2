@@ -1,5 +1,5 @@
-import os
 import ssl
+import os
 import requests
 from telebot.async_telebot import AsyncTeleBot
 from selenium import webdriver
@@ -23,17 +23,22 @@ proxy_auth = "28VM8Q1D:1BPQ1ALQ"
 os.environ['HTTP_PROXY'] = f'http://{proxy}'
 os.environ['HTTPS_PROXY'] = f'https://{proxy}'
 
-# Отключаем проверку hostname для SSL-соединений
-ssl._create_default_https_context = ssl._create_unverified_context
+# Настройка SSL контекста для игнорирования проверки hostname
+context = ssl.create_default_context()
+context.check_hostname = False
+context.verify_mode = ssl.CERT_NONE
 
-# Запросы через прокси для теста (необходимо для загрузки нужных данных)
+# Прокси настройки для requests
+proxies = {
+    'http': f'http://{proxy}',
+    'https': f'https://{proxy}'
+}
+
+# Функция для тестирования прокси соединения
 def test_proxy_connection():
-    proxies = {
-        'http': f'http://{proxy}',
-        'https': f'https://{proxy}'
-    }
     try:
-        response = requests.get('https://www.google.com', proxies=proxies, timeout=5, verify=False)  # Отключаем проверку SSL
+        # Устанавливаем прокси и отключаем SSL в контексте
+        response = requests.get('https://www.google.com', proxies=proxies, timeout=5, verify=False, stream=True)
         return response.status_code == 200
     except requests.RequestException as e:
         print(f"Proxy connection test failed: {e}")
