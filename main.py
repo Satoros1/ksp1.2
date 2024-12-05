@@ -76,7 +76,7 @@ async def menu(message):
 
                 # Если токен новый
                 if name not in previous_mints:
-                    if mints_int > 10000:  # Новый токен с количеством больше 10000
+                    if mints_int > 5000:  # Новый токен с количеством больше 10000
                         result.append(f"🔥New KRC-20 - {name} {mints_int} mints!")
                     previous_mints[name] = mints_int
                 else:
