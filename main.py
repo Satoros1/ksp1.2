@@ -4,6 +4,8 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import asyncio
 import time
 import re
@@ -26,8 +28,6 @@ def pars():
     chrome_options.add_argument("--headless")  # Отключаем отображение браузера
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
-
-    # Указываем путь к браузеру, если он не в стандартном месте
     chrome_options.binary_location = "/usr/bin/google-chrome"  # Путь к установленному Google Chrome
 
     # Инициализация драйвера
@@ -35,9 +35,11 @@ def pars():
 
     try:
         driver.get('https://kas.fyi/krc20-tokens?view=trending')
-        time.sleep(5)  # Ждём загрузки страницы
-
-        elements = driver.find_elements(By.CSS_SELECTOR, '.flex-grow-1')
+        
+        # Явное ожидание загрузки элементов (ждем 10 секунд)
+        elements = WebDriverWait(driver, 10).until(
+            EC.presence_of_all_elements_located((By.CSS_SELECTOR, '.flex-grow-1'))
+        )
 
         for element in elements:
             data.append(element.text)
