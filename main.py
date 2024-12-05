@@ -1,53 +1,17 @@
-import ssl
-import os
-import requests
 from telebot.async_telebot import AsyncTeleBot
+from telebot import types
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
 import asyncio
 import time
 import re
 
 # Токен вашего бота
 BOT_TOKEN = "8108601042:AAGT-oTHp7HvZ1Lk6-UaINeqOEwrTshNL08"
+
 bot = AsyncTeleBot(BOT_TOKEN)
-
-# Настройка прокси
-proxy = "89.213.255.244:46990"
-proxy_auth = "28VM8Q1D:1BPQ1ALQ"
-
-# Устанавливаем прокси для HTTP/HTTPS
-os.environ['HTTP_PROXY'] = f'http://{proxy}'
-os.environ['HTTPS_PROXY'] = f'https://{proxy}'
-
-# Настройка SSL контекста для игнорирования проверки hostname
-context = ssl.create_default_context()
-context.check_hostname = False
-context.verify_mode = ssl.CERT_NONE
-
-# Прокси настройки для requests
-proxies = {
-    'http': f'http://{proxy}',
-    'https': f'https://{proxy}'
-}
-
-# Функция для тестирования прокси соединения
-def test_proxy_connection():
-    try:
-        # Устанавливаем прокси и отключаем SSL в контексте
-        response = requests.get('https://www.google.com', proxies=proxies, timeout=5, verify=False, stream=True)
-        return response.status_code == 200
-    except requests.RequestException as e:
-        print(f"Proxy connection test failed: {e}")
-        return False
-
-# Проверка подключения через прокси
-if not test_proxy_connection():
-    print("Proxy setup failed. Check your proxy settings.")
-    exit()
 
 def pars():
     """
@@ -55,25 +19,19 @@ def pars():
     """
     data = []
 
-    # Установка ChromeDriver через webdriver-manager
-    chrome_driver_path = ChromeDriverManager().install()  # Он будет скачан через прокси, если прокси настроен
+    # Укажите путь к вашему установленному ChromeDriver
+    chromedriver_path = "/usr/bin/chromedriver"  # Или другой путь, где находится ваш chromedriver
 
     chrome_options = Options()
     chrome_options.add_argument("--headless")  # Отключаем отображение браузера
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
-    
-    # Настроим прокси для WebDriver
-    chrome_options.add_argument(f'--proxy-server=http://{proxy}')
-    
-    # Если прокси требует авторизации
-    chrome_options.add_argument(f'--proxy-auth={proxy_auth}')
 
-    driver = webdriver.Chrome(service=Service(chrome_driver_path), options=chrome_options)
+    driver = webdriver.Chrome(service=Service(chromedriver_path), options=chrome_options)
 
     try:
         driver.get('https://kas.fyi/krc20-tokens?view=trending')
-        time.sleep(5)  # Ждем загрузки страницы
+        time.sleep(5)  # Ждём загрузки страницы
 
         elements = driver.find_elements(By.CSS_SELECTOR, '.flex-grow-1')
 
@@ -118,7 +76,7 @@ async def menu(message):
 
                 # Если токен новый
                 if name not in previous_mints:
-                    if mints_int > 10000:  # Новый токен с количеством больше 4000
+                    if mints_int > 10000:  # Новый токен с количеством больше 10000
                         result.append(f"🔥New KRC-20 - {name} {mints_int} mints!")
                     previous_mints[name] = mints_int
                 else:
