@@ -20,7 +20,7 @@ def pars():
     data = []
 
     # Укажите путь к вашему установленному ChromeDriver
-    chromedriver_path = "/usr/bin/chromedriver"  # Или другой путь, где находится ваш chromedriver
+    chromedriver_path = "/usr/local/bin/chromedriver"  # Или другой путь, где находится ваш chromedriver
 
     chrome_options = Options()
     chrome_options.add_argument("--headless")  # Отключаем отображение браузера
