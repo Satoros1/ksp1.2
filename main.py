@@ -1,5 +1,6 @@
 import os
 import ssl
+import requests
 from telebot.async_telebot import AsyncTeleBot
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -12,19 +13,36 @@ import re
 
 # Токен вашего бота
 BOT_TOKEN = "8108601042:AAGT-oTHp7HvZ1Lk6-UaINeqOEwrTshNL08"
-
 bot = AsyncTeleBot(BOT_TOKEN)
 
 # Настройка прокси
 proxy = "89.213.255.244:46990"
 proxy_auth = "28VM8Q1D:1BPQ1ALQ"
 
-# Устанавливаем прокси в переменные окружения
+# Устанавливаем прокси для HTTP/HTTPS
 os.environ['HTTP_PROXY'] = f'http://{proxy}'
 os.environ['HTTPS_PROXY'] = f'https://{proxy}'
 
 # Отключаем проверку hostname для SSL-соединений
 ssl._create_default_https_context = ssl._create_unverified_context
+
+# Запросы через прокси для теста (необходимо для загрузки нужных данных)
+def test_proxy_connection():
+    proxies = {
+        'http': f'http://{proxy}',
+        'https': f'https://{proxy}'
+    }
+    try:
+        response = requests.get('https://www.google.com', proxies=proxies, timeout=5)
+        return response.status_code == 200
+    except requests.RequestException as e:
+        print(f"Proxy connection test failed: {e}")
+        return False
+
+# Проверка подключения через прокси
+if not test_proxy_connection():
+    print("Proxy setup failed. Check your proxy settings.")
+    exit()
 
 def pars():
     """
