@@ -33,7 +33,7 @@ def test_proxy_connection():
         'https': f'https://{proxy}'
     }
     try:
-        response = requests.get('https://www.google.com', proxies=proxies, timeout=5)
+        response = requests.get('https://www.google.com', proxies=proxies, timeout=5, verify=False)  # Отключаем проверку SSL
         return response.status_code == 200
     except requests.RequestException as e:
         print(f"Proxy connection test failed: {e}")
