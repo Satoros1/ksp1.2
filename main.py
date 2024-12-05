@@ -23,10 +23,14 @@ def pars():
     chrome_service = Service(ChromeDriverManager().install())
     chrome_options = Options()
     chrome_options.add_argument("--headless")  # Отключаем отображение браузера
-    chrome_options.add_argument("--disable-gpu")  # Для ускорения
-    chrome_options.add_argument("--no-sandbox")  # Для серверов Linux
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--no-sandbox")
+
+    # Указываем путь к бинарному файлу Chrome вручную
+    chrome_options.binary_location = "/usr/bin/google-chrome"  # Путь может отличаться в зависимости от вашей установки
 
     driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
+    
     try:
         driver.get('https://kas.fyi/krc20-tokens?view=trending')
         time.sleep(5)  # Ждём загрузки страницы
