@@ -1,8 +1,12 @@
-import requests
-from bs4 import BeautifulSoup
-import asyncio
-import re
 from telebot.async_telebot import AsyncTeleBot
+from telebot import types
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+import asyncio
+import time
+import re
 
 # Токен вашего бота
 BOT_TOKEN = "8108601042:AAGT-oTHp7HvZ1Lk6-UaINeqOEwrTshNL08"
@@ -15,22 +19,33 @@ def pars():
     """
     data = []
 
-    # URL страницы для парсинга
-    url = 'https://kas.fyi/krc20-tokens?view=trending'
+    # Укажите правильный путь к вашему установленному ChromeDriver
+    chromedriver_path = "/usr/local/bin/chromedriver"  # Или другой путь, где находится ваш chromedriver
+
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")  # Отключаем отображение браузера
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--no-sandbox")
+
+    # Указываем путь к браузеру, если он не в стандартном месте
+    chrome_options.binary_location = "/usr/bin/google-chrome"  # Путь к установленному Google Chrome
+
+    # Инициализация драйвера
+    driver = webdriver.Chrome(service=Service(chromedriver_path), options=chrome_options)
 
     try:
-        # Отправка запроса и получение HTML-страницы
-        response = requests.get(url)
-        soup = BeautifulSoup(response.text, 'html.parser')
+        driver.get('https://kas.fyi/krc20-tokens?view=trending')
+        time.sleep(5)  # Ждём загрузки страницы
 
-        # Извлекаем все элементы с нужным классом
-        elements = soup.select('.flex-grow-1')
+        elements = driver.find_elements(By.CSS_SELECTOR, '.flex-grow-1')
 
         for element in elements:
             data.append(element.text)
 
     except Exception as e:
         print(f"Error while parsing: {e}")
+    finally:
+        driver.quit()
 
     clear_data = []
     for entry in data:
@@ -65,7 +80,7 @@ async def menu(message):
 
                 # Если токен новый
                 if name not in previous_mints:
-                    if mints_int > 5000:  # Новый токен с количеством больше 5000
+                    if mints_int > 5000:  # Новый токен с количеством больше 10000
                         result.append(f"🔥New KRC-20 - {name} {mints_int} mints!")
                     previous_mints[name] = mints_int
                 else:
