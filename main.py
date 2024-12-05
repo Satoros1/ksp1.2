@@ -1,5 +1,5 @@
+import os
 from telebot.async_telebot import AsyncTeleBot
-from telebot import types
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
@@ -14,26 +14,39 @@ BOT_TOKEN = "8108601042:AAGT-oTHp7HvZ1Lk6-UaINeqOEwrTshNL08"
 
 bot = AsyncTeleBot(BOT_TOKEN)
 
+# Настройка прокси
+proxy = "89.213.255.244:46990"
+proxy_auth = "28VM8Q1D:1BPQ1ALQ"
+
+# Устанавливаем прокси в переменные окружения
+os.environ['HTTP_PROXY'] = f'http://{proxy}'
+os.environ['HTTPS_PROXY'] = f'https://{proxy}'
 
 def pars():
     """
     Функция для парсинга данных с сайта.
     """
     data = []
-    chrome_service = Service(ChromeDriverManager().install())
+
+    # Установка ChromeDriver через webdriver-manager
+    chrome_driver_path = ChromeDriverManager().install()  # Он будет скачан через прокси, если прокси настроен
+
     chrome_options = Options()
     chrome_options.add_argument("--headless")  # Отключаем отображение браузера
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
-
-    # Указываем путь к бинарному файлу Chrome вручную
-    chrome_options.binary_location = "/usr/bin/google-chrome"  # Путь может отличаться в зависимости от вашей установки
-
-    driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
     
+    # Настроим прокси для WebDriver
+    chrome_options.add_argument(f'--proxy-server=http://{proxy}')
+    
+    # Если прокси требует авторизации
+    chrome_options.add_argument(f'--proxy-auth={proxy_auth}')
+
+    driver = webdriver.Chrome(service=Service(chrome_driver_path), options=chrome_options)
+
     try:
         driver.get('https://kas.fyi/krc20-tokens?view=trending')
-        time.sleep(5)  # Ждём загрузки страницы
+        time.sleep(5)  # Ждем загрузки страницы
 
         elements = driver.find_elements(By.CSS_SELECTOR, '.flex-grow-1')
 
